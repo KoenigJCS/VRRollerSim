@@ -22,13 +22,7 @@ public class TrackCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MakeTrack(Vector3.right*10,Vector3.zero,new Vector3(0,0,0));
-        MakeTrack(MakeTrack(Vector3.left*10,Vector3.zero,new Vector3(0,90,0)),new Vector3(0,90,0));
-        MakeTrack(Vector3.forward*10,Vector3.zero,new Vector3(0,90,0),4f);
-        MakeTrack(Vector3.forward*20,Vector3.zero,new Vector3(0,0,90),16f);
-        MakeTrack(Vector3.forward*-10,Vector3.zero,new Vector3(90,0,90),1);
-        MakeTrack(Vector3.forward*-20,Vector3.zero,new Vector3(180,0,90),1);
-        MakeTrack(MakeTrack(MakeTrack(MakeTrack(Vector3.forward*-50,Vector3.zero,new Vector3(0,1,90)),new Vector3(0,2,180)),new Vector3(0,1,270)),new Vector3(0,0,360));
+        MakeTrack(Vector3.zero,Vector3.zero,new Vector3(0,0,0));
     }
 
     // Update is called once per frame
@@ -41,12 +35,12 @@ public class TrackCreator : MonoBehaviour
     {
         Vector3 partialRotation = (newRotation-startRotation)/(subDivides-1);
         Vector3 nextLocation = startLocation;
-        float scaleFactor = length / subDivides;
+        float scaleFactor = 4*length / subDivides;
         for(int i = 0;i<subDivides;i++)
         {
             Quaternion nextRotationQuatr = Quaternion.Euler(startRotation+(partialRotation*i));
             GameObject newTrack = Instantiate(trackPiecePrefab,nextLocation,nextRotationQuatr,trackParent);
-            newTrack.transform.localScale=new Vector3(scaleFactor*newTrack.transform.localScale.x,newTrack.transform.localScale.y,newTrack.transform.localScale.z);
+            newTrack.transform.localScale=new Vector3(scaleFactor*newTrack.transform.localScale.x,4*newTrack.transform.localScale.y,4*newTrack.transform.localScale.z);
             nextLocation+=nextRotationQuatr*Vector3.right*scaleFactor;
         }
         return new PieceData(nextLocation,newRotation);
