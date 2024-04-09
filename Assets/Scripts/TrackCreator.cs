@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.XR.CoreUtils;
 using UnityEngine;
 
 public struct PieceData
@@ -18,11 +17,16 @@ public class TrackCreator : MonoBehaviour
 {
     public int subDivides = 8;
     [SerializeField] private GameObject trackPiecePrefab;
+    [SerializeField] private GameObject subParent;
     [SerializeField] private Transform trackParent;
+    public static TrackCreator inst;
+    private void Awake() {
+        inst = this;
+    }
     // Start is called before the first frame update
     void Start()
     {
-        MakeTrack(Vector3.zero,Vector3.zero,new Vector3(0,0,0));
+        
     }
 
     // Update is called once per frame
@@ -36,13 +40,16 @@ public class TrackCreator : MonoBehaviour
         Vector3 partialRotation = (newRotation-startRotation)/(subDivides-1);
         Vector3 nextLocation = startLocation;
         float scaleFactor = 4*length / subDivides;
+        GameObject segment = Instantiate(subParent,startLocation,Quaternion.identity,trackParent);
         for(int i = 0;i<subDivides;i++)
         {
             Quaternion nextRotationQuatr = Quaternion.Euler(startRotation+(partialRotation*i));
-            GameObject newTrack = Instantiate(trackPiecePrefab,nextLocation,nextRotationQuatr,trackParent);
+            GameObject newTrack = Instantiate(trackPiecePrefab,nextLocation,nextRotationQuatr,segment.transform);
             newTrack.transform.localScale=new Vector3(scaleFactor*newTrack.transform.localScale.x,4*newTrack.transform.localScale.y,4*newTrack.transform.localScale.z);
             nextLocation+=nextRotationQuatr*Vector3.right*scaleFactor;
         }
+        segment.GetComponent<SegmentDataHolder>().Init(startLocation,startRotation,nextLocation,newRotation);
+        
         return new PieceData(nextLocation,newRotation);
     }
 
