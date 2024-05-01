@@ -1,10 +1,8 @@
-//CS484
-//Vladislav Petrov
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Dreamteck.Splines;
+using UnityEngine.InputSystem;
 
 public class CartMovement : MonoBehaviour
 {
@@ -58,54 +56,47 @@ public class CartMovement : MonoBehaviour
                 }
             }
         }
-        train[0].GetComponentInChildren<Camera>(true).enabled = true;
-        train[0].GetComponentInChildren<Camera>(true).GetComponent<AudioListener>().enabled = true;
-
+        //train[0].GetComponentInChildren<Camera>(true).enabled = true;
+        //train[0].GetComponentInChildren<Camera>(true).GetComponent<AudioListener>().enabled = true;
+        targetTransform= train[0].GetComponentInChildren<Camera>(true).transform;
 
         //Find the middle cart. This is for better physics.
         mainCart = train[train.Count / 2];
     }
-
+    [SerializeField] InputActionReference xStick;
+    [SerializeField] Transform XRTransformOrigin;
+    Transform targetTransform;
     // Update is called once per frame
     void Update()
     {
-        //Select cart camera with arrow keys
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        Vector2 movement = xStick.action.ReadValue<Vector2>();
+        XRTransformOrigin.position=targetTransform.position;
+        // Select cart camera with arrow keys
+        if (movement.y<=-.5f)
         {
-            CartCams[cameraIndex].enabled = false;
-            CartCams[cameraIndex].GetComponent<AudioListener>().enabled = false;
+            //CartCams[cameraIndex].enabled = false;
+            //CartCams[cameraIndex].GetComponent<AudioListener>().enabled = false;
             if (cameraIndex < CartCams.Count - 1)
             {
                 cameraIndex++;
             }
-            CartCams[cameraIndex].enabled = true;
-            CartCams[cameraIndex].GetComponent<AudioListener>().enabled = true;
+            targetTransform=CartCams[cameraIndex].transform;
+            //CartCams[cameraIndex].enabled = true;
+            //CartCams[cameraIndex].GetComponent<AudioListener>().enabled = true;
         }
-        if(Input.GetKeyDown(KeyCode.UpArrow))
+        if(movement.y>=.5f)
         {
-            CartCams[cameraIndex].enabled = false;
-            CartCams[cameraIndex].GetComponent<AudioListener>().enabled = false;
+            //CartCams[cameraIndex].enabled = false;
+            //CartCams[cameraIndex].GetComponent<AudioListener>().enabled = false;
             if (cameraIndex > 0)
             {
                 cameraIndex--;
             }
-            CartCams[cameraIndex].enabled = true;
-            CartCams[cameraIndex].GetComponent<AudioListener>().enabled = true;
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            seatSide = -0.5f;
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            seatSide = 0.5f;
+            targetTransform=CartCams[cameraIndex].transform;
+            //CartCams[cameraIndex].enabled = true;
+            //CartCams[cameraIndex].GetComponent<AudioListener>().enabled = true;
         }
 
-        //Camera control (Using mouse. Needs VR support.)
-        cameraRotationX += Input.GetAxis("Mouse Y") * -cameraSensitivity;
-        cameraRotationY += Input.GetAxis("Mouse X") * cameraSensitivity;
-        CartCams[cameraIndex].transform.localEulerAngles = new Vector3(cameraRotationX, cameraRotationY, 0);
-        CartCams[cameraIndex].transform.localPosition = new Vector3(seatSide, 2, 0);
 
 
         //Figure out the acceleration and speed based on the angle when on free track
